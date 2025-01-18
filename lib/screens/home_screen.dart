@@ -30,7 +30,16 @@ class HomeScreen extends StatelessWidget {
         future: webtoons,
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            return makeList(snapshot);
+            return Column(
+              children: [
+                const SizedBox(
+                  height: 50,
+                ),
+                Expanded(
+                  child: makeList(snapshot),
+                ),
+              ],
+            );
           }
           return const Center(
             child: CircularProgressIndicator(),
@@ -42,20 +51,45 @@ class HomeScreen extends StatelessWidget {
 
   ListView makeList(AsyncSnapshot<List<WebtoonModel>> snapshot) {
     return ListView.separated(
-      scrollDirection: Axis.vertical,
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+      scrollDirection: Axis.horizontal,
       itemCount: snapshot.data!.length,
       itemBuilder: (context, index) {
         final webtoon = snapshot.data![index];
         print(index);
-        return Text(
-          webtoon.title,
-          style: const TextStyle(
-            fontSize: 50,
-          ),
+        return Column(
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                boxShadow: [
+                  BoxShadow(
+                    blurRadius: 7,
+                    offset: const Offset(5, 5),
+                    color: Colors.black.withAlpha(150),
+                  ),
+                ],
+                borderRadius: const BorderRadius.all(Radius.circular(20)),
+              ),
+              clipBehavior: Clip.hardEdge,
+              width: 250,
+              child: Image.network(
+                webtoon.thumb,
+                headers: {'Referer': 'https://comic.naver.com'},
+              ),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              webtoon.title,
+              style: const TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
         );
       },
       separatorBuilder: (context, index) => const SizedBox(
-        height: 50,
+        width: 40,
       ),
     );
   }
