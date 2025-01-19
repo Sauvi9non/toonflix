@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 class WebtoonModel {
   late final String title, thumb, id;
 

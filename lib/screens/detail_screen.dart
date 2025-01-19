@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:toonflix/models/webtoon_detail_model.dart';
 import 'package:toonflix/services/api_service.dart';
+import 'package:toonflix/widget/episode_widget.dart';
 
 import '../models/webtoon_episode_model.dart';
 
@@ -118,33 +119,7 @@ class _DetailScreenState extends State<DetailScreen> {
                         //어차피 에피소드 10개만 해줘서...
                         children: [
                           for (var episode in snapshot.data!)
-                            Container(
-                              margin: const EdgeInsets.only(bottom: 10),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(20),
-                                color: Colors.green.shade400,
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    vertical: 10, horizontal: 20),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      episode.title,
-                                      style: const TextStyle(
-                                          color: Color(0xFFFFFFFF),
-                                          fontSize: 20),
-                                    ),
-                                    const Icon(
-                                      Icons.chevron_right_rounded,
-                                      color: Color(0xFFFFFFFF),
-                                    )
-                                  ],
-                                ),
-                              ),
-                            )
+                            Episode(episode: episode, webtoonId: widget.id)
                         ],
                       );
                     }

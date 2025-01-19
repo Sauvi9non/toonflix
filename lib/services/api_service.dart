@@ -4,7 +4,6 @@ import 'package:http/http.dart' as http;
 import 'package:toonflix/models/webtoon_detail_model.dart';
 import 'package:toonflix/models/webtoon_episode_model.dart';
 import 'package:toonflix/models/webtoon_model.dart';
-import 'package:toonflix/widget/webtoon_widget.dart';
 
 class ApiService {
   //왜 static 쓰는거지...? 아니 static이 그냥 공기마냥 실행되던말든 처음부터 존재하는 그런 거인건 아는데
