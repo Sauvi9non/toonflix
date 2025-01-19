@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:toonflix/models/webtoon_detail_model.dart';
+import 'package:toonflix/services/api_service.dart';
 
-class DetailScreen extends StatelessWidget {
+import '../models/webtoon_episode_model.dart';
+
+class DetailScreen extends StatefulWidget {
   final String title, thumb, id;
 
   const DetailScreen({
@@ -9,6 +13,22 @@ class DetailScreen extends StatelessWidget {
     required this.thumb,
     required this.id,
   });
+
+  @override
+  State<DetailScreen> createState() => _DetailScreenState();
+}
+
+class _DetailScreenState extends State<DetailScreen> {
+  //여기서는 Homescreen에서 한 것처럼 getToonById를 할 수 없다.
+  late Future<WebtoonDetailModel> webtoon;
+  late Future<List<WebtoonEpisodeModel>> episodes;
+
+  @override
+  void initState() {
+    super.initState();
+    webtoon = ApiService.getToonById(widget.id);
+    episodes = ApiService.getLatestEpisodesById(widget.id);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +41,7 @@ class DetailScreen extends StatelessWidget {
         surfaceTintColor: Colors.transparent,
         elevation: 10,
         title: Text(
-          title,
+          widget.title,
           style: const TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
@@ -37,7 +57,7 @@ class DetailScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Hero(
-                tag: id,
+                tag: widget.id,
                 child: Container(
                   decoration: BoxDecoration(
                     boxShadow: [
@@ -52,13 +72,42 @@ class DetailScreen extends StatelessWidget {
                   clipBehavior: Clip.hardEdge,
                   width: 250,
                   child: Image.network(
-                    thumb,
+                    widget.thumb,
                     headers: {'Referer': 'https://comic.naver.com'},
                   ),
                 ),
               ),
             ],
           ),
+          const SizedBox(
+            height: 25,
+          ),
+          FutureBuilder(
+              future: webtoon,
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 50),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          snapshot.data!.about,
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                        const SizedBox(
+                          height: 50,
+                        ),
+                        Text(
+                          "${snapshot.data!.genre} / ${snapshot.data!.age}",
+                          style: const TextStyle(fontSize: 16),
+                        )
+                      ],
+                    ),
+                  );
+                }
+                return const Text("...");
+              }),
         ],
       ),
     ); //홈 스크린을 떠날거라서 Scaffold 다시 그려줘야한다.
