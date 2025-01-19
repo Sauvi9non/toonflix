@@ -48,67 +48,111 @@ class _DetailScreenState extends State<DetailScreen> {
           ),
         ),
       ),
-      body: Column(
-        children: [
-          const SizedBox(
-            height: 50,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(50),
+          child: Column(
             children: [
-              Hero(
-                tag: widget.id,
-                child: Container(
-                  decoration: BoxDecoration(
-                    boxShadow: [
-                      BoxShadow(
-                        blurRadius: 7,
-                        offset: const Offset(5, 5),
-                        color: Colors.black.withAlpha(150),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Hero(
+                    tag: widget.id,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        boxShadow: [
+                          BoxShadow(
+                            blurRadius: 7,
+                            offset: const Offset(5, 5),
+                            color: Colors.black.withAlpha(150),
+                          ),
+                        ],
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(20)),
                       ),
-                    ],
-                    borderRadius: const BorderRadius.all(Radius.circular(20)),
+                      clipBehavior: Clip.hardEdge,
+                      width: 250,
+                      child: Image.network(
+                        widget.thumb,
+                        headers: {'Referer': 'https://comic.naver.com'},
+                      ),
+                    ),
                   ),
-                  clipBehavior: Clip.hardEdge,
-                  width: 250,
-                  child: Image.network(
-                    widget.thumb,
-                    headers: {'Referer': 'https://comic.naver.com'},
-                  ),
-                ),
+                ],
               ),
+              const SizedBox(
+                height: 25,
+              ),
+              FutureBuilder(
+                  future: webtoon,
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            snapshot.data!.about,
+                            style: const TextStyle(fontSize: 16),
+                          ),
+                          const SizedBox(
+                            height: 50,
+                          ),
+                          Text(
+                            "${snapshot.data!.genre} / ${snapshot.data!.age}",
+                            style: const TextStyle(fontSize: 16),
+                          )
+                        ],
+                      );
+                    }
+                    return const Text("...");
+                  }),
+              const SizedBox(
+                height: 25,
+              ),
+              FutureBuilder(
+                  future: episodes,
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      print(snapshot.data!);
+                      return Column(
+                        //어차피 에피소드 10개만 해줘서...
+                        children: [
+                          for (var episode in snapshot.data!)
+                            Container(
+                              margin: const EdgeInsets.only(bottom: 10),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(20),
+                                color: Colors.green.shade400,
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 10, horizontal: 20),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      episode.title,
+                                      style: const TextStyle(
+                                          color: Color(0xFFFFFFFF),
+                                          fontSize: 20),
+                                    ),
+                                    const Icon(
+                                      Icons.chevron_right_rounded,
+                                      color: Color(0xFFFFFFFF),
+                                    )
+                                  ],
+                                ),
+                              ),
+                            )
+                        ],
+                      );
+                    }
+                    return const Text("No data");
+                  })
             ],
           ),
-          const SizedBox(
-            height: 25,
-          ),
-          FutureBuilder(
-              future: webtoon,
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 50),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          snapshot.data!.about,
-                          style: const TextStyle(fontSize: 16),
-                        ),
-                        const SizedBox(
-                          height: 50,
-                        ),
-                        Text(
-                          "${snapshot.data!.genre} / ${snapshot.data!.age}",
-                          style: const TextStyle(fontSize: 16),
-                        )
-                      ],
-                    ),
-                  );
-                }
-                return const Text("...");
-              }),
-        ],
+        ),
       ),
     ); //홈 스크린을 떠날거라서 Scaffold 다시 그려줘야한다.
   }
