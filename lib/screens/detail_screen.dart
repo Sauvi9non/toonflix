@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toonflix/models/webtoon_detail_model.dart';
 import 'package:toonflix/services/api_service.dart';
 import 'package:toonflix/widget/episode_widget.dart';
@@ -23,18 +24,60 @@ class _DetailScreenState extends State<DetailScreen> {
   //여기서는 Homescreen에서 한 것처럼 getToonById를 할 수 없다.
   late Future<WebtoonDetailModel> webtoon;
   late Future<List<WebtoonEpisodeModel>> episodes;
+  late SharedPreferences prefs;
+  bool isLiked = false;
+
+  Future initPrefs() async {
+    prefs = await SharedPreferences.getInstance(); //저장소와 커넥션
+    final likedToons = prefs.getStringList('likedToons'); //likedToons라는 key로 찾기
+    if (likedToons != null) {
+      if (likedToons.contains(widget.id) == true) {
+        setState(() {
+          //UI 리프레쉬를 해줘야한다.
+          isLiked = true;
+        });
+      }
+    } else {
+      await prefs.setStringList('likedToons', []); //future니까 await
+    }
+  }
 
   @override
   void initState() {
+    //상태 초기화
     super.initState();
     webtoon = ApiService.getToonById(widget.id);
     episodes = ApiService.getLatestEpisodesById(widget.id);
+    initPrefs();
+  }
+
+  onHeartTap() async {
+    final likedToons = prefs.getStringList('likedToons');
+    if (likedToons != null) {
+      if (isLiked) {
+        likedToons.remove(widget.id);
+      } else {
+        likedToons.add(widget.id);
+      }
+      await prefs.setStringList('likedToons', likedToons);
+      setState(() {
+        isLiked = !isLiked;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        actions: [
+          IconButton(
+            onPressed: onHeartTap,
+            icon: Icon(isLiked
+                ? Icons.favorite_rounded
+                : Icons.favorite_outline), //Icon(Icons.favorite_rounded),
+          ),
+        ],
         centerTitle: true,
         shadowColor: Colors.black,
         foregroundColor: Colors.green,
